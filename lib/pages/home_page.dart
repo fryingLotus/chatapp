@@ -52,7 +52,6 @@ class _HomePageState extends State<HomePage> {
       drawer: const MyDrawer(),
       body: Column(
         children: [
-  
           MyTextField(
             controller: _searchController,
             hintText: "Search by email",
@@ -67,8 +66,8 @@ class _HomePageState extends State<HomePage> {
 
   // build a list of users except for the current logged-in user
   Widget _buildUserList() {
-    return StreamBuilder(
-      stream: _chatServices.getUserStream(),
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: _chatServices.getUserStreamExcludeBlocked(),
       builder: (context, snapshot) {
         // error check
         if (snapshot.hasError) {
@@ -80,8 +79,12 @@ class _HomePageState extends State<HomePage> {
         }
         var users = snapshot.data!;
         if (_searchQuery.isNotEmpty) {
-          users = users.where((user) =>
-              user["email"].toString().toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+          users = users
+              .where((user) => user["email"]
+                  .toString()
+                  .toLowerCase()
+                  .contains(_searchQuery.toLowerCase()))
+              .toList();
         }
         return ListView(
           children: users
@@ -93,7 +96,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   // build individual list tile for users
-  Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
+  Widget _buildUserListItem(
+      Map<String, dynamic> userData, BuildContext context) {
     // display all users except the current user
     if (userData["email"] != _authService.getCurrentUser()!.email) {
       return UserTile(
@@ -116,4 +120,3 @@ class _HomePageState extends State<HomePage> {
     }
   }
 }
-
