@@ -20,30 +20,38 @@ class _ChatPageState extends State<ChatPage> {
 
   // chat & auth services
   final ChatServices _chatServices = ChatServices();
-
   final AuthService _authService = AuthService();
   FocusNode myFocusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
 
     myFocusNode.addListener(() {
       if (myFocusNode.hasFocus) {
-        // wait for keyboard to show up then scrolldown
+        // wait for keyboard to show up then scroll down
         Future.delayed(const Duration(milliseconds: 500), () => scrollDown());
       }
     });
-    Future.delayed(const Duration(milliseconds: 500), () => scrollDown());
+
+    // Call markMessagesAsRead when the page is initialized
+    _markMessagesAsRead();
   }
 
   @override
   void dispose() {
     myFocusNode.dispose();
     _messageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
-  final ScrollController _scrollController = ScrollController();
+  void _markMessagesAsRead() async {
+    final currentUser = _authService.getCurrentUser()!;
+    await _chatServices.markMessagesAsRead(currentUser.uid, widget.receiverID);
+  }
+
   void scrollDown() {
     _scrollController.animateTo(_scrollController.position.maxScrollExtent,
         duration: const Duration(seconds: 1), curve: Curves.fastOutSlowIn);
@@ -55,10 +63,11 @@ class _ChatPageState extends State<ChatPage> {
       await _chatServices.sendMessage(
           widget.receiverID, _messageController.text);
       _messageController.clear();
+      scrollDown();
     }
-    scrollDown();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,

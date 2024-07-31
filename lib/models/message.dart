@@ -6,14 +6,18 @@ class Message {
   final String receiverID;
   final String message;
   final Timestamp timestamp;
+  final bool isRead;
 
-  Message(
-      {required this.senderID,
-      required this.senderEmail,
-      required this.receiverID,
-      required this.message,
-      required this.timestamp});
-  // to map
+  Message({
+    required this.senderID,
+    required this.senderEmail,
+    required this.receiverID,
+    required this.message,
+    required this.timestamp,
+    this.isRead = false, // Default value is false
+  });
+
+  // Convert a Message instance to a map
   Map<String, dynamic> toMap() {
     return {
       'senderID': senderID,
@@ -21,6 +25,19 @@ class Message {
       'receiverID': receiverID,
       'message': message,
       'timestamp': timestamp,
+      'isRead': isRead,
     };
+  }
+
+  // Create a Message instance from a map
+  factory Message.fromMap(Map<String, dynamic> map) {
+    return Message(
+      senderID: map['senderID'],
+      senderEmail: map['senderEmail'],
+      receiverID: map['receiverID'],
+      message: map['message'],
+      timestamp: map['timestamp'],
+      isRead: map['isRead'] ?? false, // Default to false if not present
+    );
   }
 }

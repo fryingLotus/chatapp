@@ -88,7 +88,17 @@ class _HomePageState extends State<HomePage> {
         }
         return ListView(
           children: users
-              .map<Widget>((userData) => _buildUserListItem(userData, context))
+              .map<Widget>((userData) => FutureBuilder<int>(
+                    future: _chatServices.getUnreadMessagesCount(
+                        _authService.getCurrentUser()!.uid, userData["uid"]),
+                    builder: (context, snapshot) {
+                      int unreadCount = 0;
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        unreadCount = snapshot.data ?? 0;
+                      }
+                      return _buildUserListItem(userData, unreadCount, context);
+                    },
+                  ))
               .toList(),
         );
       },
@@ -97,11 +107,12 @@ class _HomePageState extends State<HomePage> {
 
   // build individual list tile for users
   Widget _buildUserListItem(
-      Map<String, dynamic> userData, BuildContext context) {
+      Map<String, dynamic> userData, int unreadCount, BuildContext context) {
     // display all users except the current user
     if (userData["email"] != _authService.getCurrentUser()!.email) {
       return UserTile(
         text: userData["email"],
+        unreadCount: unreadCount,
         onTap: () {
           // tapped on a user -> go to chat page
           Navigator.push(
