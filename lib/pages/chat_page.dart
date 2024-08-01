@@ -1,9 +1,11 @@
 import 'package:chatapp/components/chat_bubble.dart';
 import 'package:chatapp/components/my_textfield.dart';
 import 'package:chatapp/services/auth/auth_service.dart';
+import 'package:chatapp/services/chat/chat_provider.dart';
 import 'package:chatapp/services/chat/chat_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ChatPage extends StatefulWidget {
   final String receiverEmail;
@@ -34,9 +36,6 @@ class _ChatPageState extends State<ChatPage> {
         Future.delayed(const Duration(milliseconds: 500), () => scrollDown());
       }
     });
-
-    // Call markMessagesAsRead when the page is initialized
-    _markMessagesAsRead();
   }
 
   @override
@@ -45,11 +44,6 @@ class _ChatPageState extends State<ChatPage> {
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _markMessagesAsRead() async {
-    final currentUser = _authService.getCurrentUser()!;
-    await _chatServices.markMessagesAsRead(currentUser.uid, widget.receiverID);
   }
 
   void scrollDown() {
@@ -166,3 +160,4 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 }
+

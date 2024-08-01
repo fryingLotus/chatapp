@@ -21,4 +21,3 @@ class ChatProvider with ChangeNotifier {
     await fetchUnreadCounts(userID, otherUserID);
   }
 }
-

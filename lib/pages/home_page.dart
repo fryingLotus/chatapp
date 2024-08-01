@@ -108,13 +108,23 @@ class _HomePageState extends State<HomePage> {
   // build individual list tile for users
   Widget _buildUserListItem(
       Map<String, dynamic> userData, int unreadCount, BuildContext context) {
-    // display all users except the current user
     if (userData["email"] != _authService.getCurrentUser()!.email) {
       return UserTile(
         text: userData["email"],
         unreadCount: unreadCount,
-        onTap: () {
-          // tapped on a user -> go to chat page
+        onTap: () async {
+          // Mark messages as read and update state
+          await _chatServices.markMessagesAsRead(
+            _authService.getCurrentUser()!.uid,
+            userData["uid"],
+          );
+
+          // Refresh the state to update the UI
+          setState(() {
+            // This forces a rebuild to reflect changes
+          });
+
+          // Navigate to chat page
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -131,3 +141,4 @@ class _HomePageState extends State<HomePage> {
     }
   }
 }
+

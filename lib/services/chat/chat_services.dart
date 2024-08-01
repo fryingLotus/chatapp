@@ -97,8 +97,10 @@ class ChatServices extends ChangeNotifier {
         .get();
 
     for (var doc in querySnapshot.docs) {
+      print('Updating message: ${doc.id} to read');
       await doc.reference.update({'isRead': true});
     }
+    print('All unread messages marked as read for chatroomID: $chatroomID');
   }
 
   Future<void> reportUser(String messageId, String userId) async {
